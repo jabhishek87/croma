@@ -1,0 +1,18 @@
+web:
+  image: nginx
+  volumes:
+    - ./initial:/usr/share/nginx/html
+  ports:
+   - "80:80"
+  # environment:
+  #  - NGINX_HOST=foobar.com
+  #  - NGINX_PORT=80
+
+croma:
+  services:
+    web:
+      build: .
+        ports:
+          - "8000:8000"
+        volumes:
+          - ./db:/code/db
