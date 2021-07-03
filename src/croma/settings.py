@@ -1,8 +1,9 @@
-#  pg_dump -d croma --host=localhost --port=5432 --username=postgres --password=root --clean    > backup 
-#  psql -d croma -U postgres -f backup     
+#  pg_dump -d croma --host=localhost --port=5432 --username=postgres --password=root --clean    > backup
+#  psql -d croma -U postgres -f backup
 
-import os
 import logging
+import os
+
 import environ
 
 env = environ.Env()
@@ -117,34 +118,12 @@ backup_dir = "E:\\backup"
 if not os.path.exists(backup_dir):
     os.makedirs(backup_dir)
 
-
-DB_USER = env("DB_USER", default="postgres")
-DB_PASS = env("DB_PASS", default="root")
-DB_HOST = env("DB_HOST", default="localhost")
-DB_NAME = env("DB_NAME", default="croma")
-DB_BACKUP_LOCATION = env("DB_BACKUP_LOCATION", default=backup_dir)
-PGDUMP_LOCATION = env("PGDUMP_LOCATION",
-                     default = "C:\\Program Files\\PostgreSQL\\8.4\\bin\\pg_dump.exe")
-PSQL_LOCATION = env("PSQL_LOCATION", 
-        default = "C:\\Program Files\\PostgreSQL\\8.4\\bin\\psql.exe")
-
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': DB_NAME,
-        'USER': DB_USER,
-        'PASSWORD': DB_PASS,
-        'PORT': '5432',
-        'HOST': DB_HOST,   # Or an IP Address that your DB is hosted on
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db/db.sqlite3'),
     }
 }
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-#     }
-# }
 
 
 AUTH_PASSWORD_VALIDATORS = [
