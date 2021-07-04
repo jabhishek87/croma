@@ -540,8 +540,18 @@ $("#view_inv").click(function () {
         url: "/sales/view_invoice",
         datatype: 'json',
         data: data,
-        complete: function () {
+        complete: function(blob, status, xhr) {
             $this.button('reset');
+            // console.log(data)
+            // console.log(blob)
+            // console.log(status)
+            // console.log(blob.responseJSON.inv_data)
+            mime_type= 'text/plain'
+            var blob = new Blob([blob.responseJSON.inv_data], { type: mime_type });
+
+            var URL = window.URL || window.webkitURL;
+            var downloadUrl = URL.createObjectURL(blob);
+            window.open(downloadUrl, '_blank');
         },
         success: function (data) {
             if (data['status'] == 0) {

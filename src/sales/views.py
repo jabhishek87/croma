@@ -1,26 +1,29 @@
-from django.shortcuts import render, redirect, Http404, get_object_or_404
-from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.db import transaction
-from django.views import View
-from django.core.serializers import serialize
-from django.views.generic import UpdateView
-from django.conf import settings
 import json
-import os
 import logging
+import mimetypes
+import os
 import subprocess as sp
 import sys
+from pathlib import Path
 
-from item_master.models import Item, Batch
-from .models import *
-from .forms import *
-from .serializers import *
-from .models import Party, Doctor
-from .utils import create_SaleInvDtl_JSON_QuerySet
-from .print_inv import MakeInvoice
 from accounts.models import YearEnding
+from django.conf import settings
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.serializers import serialize
+from django.db import transaction
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
+from django.shortcuts import Http404, get_object_or_404, redirect, render
+from django.views import View
+from django.views.generic import UpdateView
+from item_master.models import Batch, Item
+
+from .forms import *
+from .models import *
+from .models import Doctor, Party
+from .print_inv import MakeInvoice
+from .serializers import *
+from .utils import create_SaleInvDtl_JSON_QuerySet
 
 logger = logging.getLogger(__name__)
 
@@ -195,7 +198,7 @@ class UpdateSale(UpdateView, LoginRequiredMixin):
 		saleInvDtl_queryset = SalesInvDtl.objects.filter(hrd_id = pk)	#Queryset of all items assocuadted with hrd_id = pk
 		sale_dtl_item_arr = create_SaleInvDtl_JSON_QuerySet(saleInvDtl_queryset)	#create a dict of all sale item for respective invoice
 		saleDtl_item_set_json = json.dumps(sale_dtl_item_arr)	#get the json data for all items
-		
+
 		saleInvhrd_form.initial["doctor_id"] = instance.doctor_id.name
 		saleInvhrd_form.initial["party_id"] = instance.party_id.name
 
@@ -246,7 +249,7 @@ class UpdateSale(UpdateView, LoginRequiredMixin):
 
 					# Saving new item or update existing item
 					# Handling Item Table. Changing The database according to new update: Create it or update it or delete it
-					
+
 					for item in sale_items:
 						item_id = item['item_id']
 						item['hrd_id'] = sale_info_obj.id
@@ -347,11 +350,11 @@ class UpdateSale(UpdateView, LoginRequiredMixin):
 							}
 					return JsonResponse(response, status = 200)
 
-				
+
 				response = {'status': 0, "errors": ["Something went wrong",]}
 				# transaction.savepoint_rollback(sid)
 				return JsonResponse(response, status = 400)
-		
+
 		except Exception as e:
 			# transaction.savepoint_rollback(sid)
 			logger.error("Error on line {} \nType: {} \nError:{}".format(sys.exc_info()[-1], type(e).__name__, str(e)))
@@ -381,7 +384,7 @@ def DeleteSale(request):
 		if last_obj != sale_inv_obj:
 			errors['no_object'] = "Error: You cannot delete this Invoice"
 			response = {'status': 0, "errors": errors}
-			return JsonResponse(response, status = 400)			
+			return JsonResponse(response, status = 400)
 
 		sale_dtl_qs = SalesInvDtl.objects.filter(hrd_id = sale_inv_obj)
 		for obj in sale_dtl_qs:
@@ -415,24 +418,29 @@ def ViewInvoice(request):
 		try:
 			MakeInvoice(json_dict)
 			file_path = getattr(settings, "PRINTINV_FILEPATH", None)
+			inv_txt = Path(file_path).read_text()
 			osCommandString = f"notepad.exe {file_path}"
-			os.system(osCommandString)
-			response = {'status': 1,}
+			#os.system(osCommandString)
+			response = {'status': 1, 'inv_data': inv_txt}
 		except:
 			response = {'status': 0,}
 	else:
 		response = {'status': 0,}
 	if response['status']:
+		# fl = open(file_path, 'r')
+		mime_type, _ = mimetypes.guess_type(file_path)
+		response['mime_type'] = mime_type
 		return JsonResponse(response, status = 200)
 	else:
 		return JsonResponse(response, status = 400)
 
 
 
+
+
 def PrintInvoice(request):
 	if not request.user.is_authenticated():
 		raise Http404
-	
 	file_path = getattr(settings, "PRINTINV_FILEPATH", None)
 	if request.method == "POST" and request.is_ajax():
 		json_dict = json.loads( request.body.decode('utf-8'))
