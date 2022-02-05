@@ -1,23 +1,23 @@
-from django.conf.urls import url, include
+from django.urls import include, re_path
 from .views import *
 
 
 urlpatterns = [
-	url(r'^api/', include("sales.api.urls"), name = "sales-api"),
-	url(r'^create/$', CreateSale.as_view(), name = "create"),
-	url(r'^(?P<pk>\d+)$', RetrieveSale, name = "detail"),
-	url(r'^(?P<pk>\d+)/edit$', UpdateSale.as_view(), name = "edit"),
+	re_path(r'^api/', include("sales.api.urls"), name = "sales-api"),
+	re_path(r'^create/$', CreateSale.as_view(), name = "create"),
+	re_path(r'^(?P<pk>\d+)$', RetrieveSale, name = "detail"),
+	re_path(r'^(?P<pk>\d+)/edit$', UpdateSale.as_view(), name = "edit"),
 
 	#ajax
-	url(r'^view_invoice$', ViewInvoice, name = "ViewInvoice"),
-	url(r'^print_invoice$', PrintInvoice, name = "PrintInvoice"),
-	url(r'^ajax/search_inv$', SearchInv, name = "SearchInv"),
+	re_path(r'^view_invoice$', ViewInvoice, name = "ViewInvoice"),
+	re_path(r'^print_invoice$', PrintInvoice, name = "PrintInvoice"),
+	re_path(r'^ajax/search_inv$', SearchInv, name = "SearchInv"),
 
-	url(r'^ajax/delete_inv$', DeleteSale, name = "DeleteSaleInv"),
+	re_path(r'^ajax/delete_inv$', DeleteSale, name = "DeleteSaleInv"),
 
 #Doctor Crud System Urls
-	url(r'^doctor/create$', DoctorCreate, name = "doctor_create"),
-	url(r'^doctor/(?P<pk>\d+)/edit', DoctorEdit, name = "doctor_edit"),
+	re_path(r'^doctor/create$', DoctorCreate, name = "doctor_create"),
+	re_path(r'^doctor/(?P<pk>\d+)/edit', DoctorEdit, name = "doctor_edit"),
 	#AJAX
-	url(r'^doctor/ajax/get_doctor_id$', get_doctor_id, name = "get_doctor_id"),
+	re_path(r'^doctor/ajax/get_doctor_id$', get_doctor_id, name = "get_doctor_id"),
 ]

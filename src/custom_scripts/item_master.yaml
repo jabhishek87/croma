@@ -1,0 +1,63 @@
+import os
+# Import the openpyxl module
+from openpyxl import load_workbook
+import yaml
+
+# since it is running from django shell cwd is not working
+# BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+BASE_DIR = '/home/aj355y/workspace/opensource/rm/croma/src/custom_scripts'
+
+file_name = os.path.join(BASE_DIR, 'drug.xlsx')
+def import_manufacturer():
+    wb = load_workbook(filename = file_name)
+    ws = wb['manufacturers']
+    for cell in ws['a']:
+        value = cell.value.strip('\n').strip()
+        if value !='' and (value !='Manufacturer *' and value !='Grand Total'):
+            print(value)
+            # add to DB
+            # rec = M(
+            #     name=value.split(',')[0],
+            #     description=value.strip('\n').strip()
+            # )
+            # rec.save()
+def write_yaml(data, filename='prod.yaml'):
+    with open(filename, 'w') as yaml_file:
+        yaml.dump(data, yaml_file, default_flow_style=False)
+
+def import_product():
+    wb = load_workbook(filename = file_name)
+    ws = wb['List of Registered Medicines']
+    names = list()
+    data = []
+    i=3
+    for cell in ws['i']:
+        if cell.value and cell.value != 'n/a':
+            value = cell.value.strip('\n').strip().encode('ascii', 'ignore').decode("utf-8").strip()
+            if value.lower() not in names:
+                # login to skip duplicate
+                names.append(value.lower())
+                data.append({
+                    'model': 'item_master.item',
+                    'pk': i,
+                    'fields': {'name':value,
+                    'salt_id':2, 'group_id':1,
+                    'unit_id':2, 'ptax_id':2,
+                    }
+                })
+                i +=1
+    write_yaml(data, "custom_scripts/item_master.yaml")
+    # import pdb; pdb.set_trace()
+
+#import_manufacturer()
+import_product()
+# d = {'A':'a', 'B':{'C':'c', 'D':'d', 'E':'e'}}
+# with open('result.yml', 'w') as yaml_file:
+#     yaml.dump(d, yaml_file, default_flow_style=False)
+# - model: salt_master.salt
+#   pk: 1
+#   fields:
+#     name: TELMISARTAN
+#     use_date: 2022-02-05
+#     user_id: 1
+#     use_time: '20:40:54.990413'

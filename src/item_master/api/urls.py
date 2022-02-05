@@ -1,7 +1,7 @@
-from django.conf.urls import url, include
+from django.urls import include, re_path
 from .views import *
 
 
 urlpatterns = [
-	url(r'^list/$', ItemListApiView.as_view(), name = "list"),
+	re_path(r'^list/$', ItemListApiView.as_view(), name = "list"),
 ]

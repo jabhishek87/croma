@@ -1,9 +1,9 @@
-from django.conf.urls import url, include
+from django.urls import include, re_path
 from .views import UnitCreate
 
 
 urlpatterns = [
-	url(r'^api/', include("unit_master.api.urls"), name = 'unit-api'),
-	url(r'^create$', UnitCreate, name = "create"),
+	re_path(r'^api/', include("unit_master.api.urls"), name = 'unit-api'),
+	re_path(r'^create$', UnitCreate, name = "create"),
 
 ]

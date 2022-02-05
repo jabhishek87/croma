@@ -125,7 +125,7 @@ class CreateSale(View, LoginRequiredMixin):
 					response = {
 						'status': 1,
 						'message': "Successfully Saved",
-						'url' : sale_hrd_obj.get_absolute_url(),
+						'url' : sale_hrd_obj.get_absolute_re_path(),
 					}
 					return JsonResponse(response, status=200)
 		except Exception as e:
@@ -346,7 +346,7 @@ class UpdateSale(UpdateView, LoginRequiredMixin):
 					response = {
 								'status': 1,
 								'message': "Successfully Saved",
-								'url' : SaleInvHrd_instance.get_absolute_url(),
+								'url' : SaleInvHrd_instance.get_absolute_re_path(),
 							}
 					return JsonResponse(response, status = 200)
 
@@ -398,7 +398,7 @@ def DeleteSale(request):
 			obj.delete()
 		try:
 			next_sale_inv = SalesInvHrd.objects.filter(id__gt = sale_inv_obj.id, session_id = current_session).order_by("pk").first()
-			url = next_sale_inv.get_absolute_url()
+			url = next_sale_inv.get_absolute_re_path()
 		except:
 			next_sale_inv = None
 			url = "/sales/create"
@@ -470,7 +470,7 @@ def SearchInv(request):
 		inv_no = request.GET.get("sale_inv")
 		if SalesInvHrd.objects.filter(session_id = current_session, doc_no = inv_no).exists():
 			sale_inv_obj = SalesInvHrd.objects.get(session_id = current_session, doc_no = inv_no)
-			response = {"status": 1, "msg" : sale_inv_obj.get_absolute_url()}
+			response = {"status": 1, "msg" : sale_inv_obj.get_absolute_re_path()}
 		else:
 			response = {"status": 0, "msg": "No Invoice Found"}
 

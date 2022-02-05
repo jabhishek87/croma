@@ -12,6 +12,7 @@ from .forms import UserLoginForm, UserRegisterForm, CompanyRegistrationForm
 from .models import Registration, YearEnding
 from salt_master.models import Salt
 from unit_master.models import Unit
+from item_master.models import TaxType
 from company_master.models import Company, Supplier
 from godown_master.models import Godown
 from purchase.models import PurchaseInvHrd
@@ -26,7 +27,7 @@ class loginView(View):
 	register_url = "/account/company/register"
 	success_url = "/"
 	User = get_user_model()
- 
+
 	@staticmethod
 	def sessionExpirationCheck():
 		currDate = datetime.date.today()
@@ -44,7 +45,7 @@ class loginView(View):
 			"form" : form,
 			"title" : "User Login",
 			"btn_txt": "Login"
-		}	
+		}
 
 	def get(self, *args, **kwargs):
 		user_qs = self.User.objects.all()
@@ -60,14 +61,14 @@ class loginView(View):
 			return redirect(self.session_redirect_url)
 
 		return render(self.request, self.template_name, self.getGetContext(self.formClass()))
-	
+
 	def post(self, *args, **kwargs):
 		form = self.formClass(self.request.POST or None)
 		register_qs = Registration.objects.all()
 		if form.is_valid():
 			username = form.cleaned_data.get("username")
 			password = form.cleaned_data.get("password")
-			session = form.cleaned_data.get("session")  
+			session = form.cleaned_data.get("session")
 			self.request.session['session'] = session.id
 			user = authenticate(username = username, password = password)
 			login(self.request, user)
@@ -82,7 +83,7 @@ def register_view(request):
 	form = UserRegisterForm(request.POST or None)
 	if form.is_valid():
 		user = form.save()
-		password = form.cleaned_data.get("password")	
+		password = form.cleaned_data.get("password")
 		user.set_password(password)
 		user.is_staff = True
 		user.save()
@@ -109,14 +110,16 @@ def logout_view(request):
 def initializeRegistration(company_instance,  today_date, end_date):
 	YearEnding.objects.create(code = "DB1",
 						year_pur_id=0, year_sale_id=0,
-													from_dt=today_date, to_dt=end_date, 
+													from_dt=today_date, to_dt=end_date,
 						registration_id=company_instance)
-	
+
 	Godown.objects.create(name = "GODOWN")
 	Supplier.objects.create(name = "SELF")
 	Company.objects.create(name = "AVENTIS PASTEUR")
 	Unit.objects.create(name = "1*10", number = 10)
 	Salt.objects.create(name = "TELMISARTAN")
+	TaxType.objects.create(name="Purchase", applicable ="Purchase")
+	TaxType.objects.create(name="Sales", applicable ="Sale")
 
 
 
@@ -172,7 +175,7 @@ class sessionExpireView(View):
 
 		return render(self.request, self.template_name, {
 			"lastEnding": YearEnding.objects.all().last()
-		})	
+		})
 
 	def post(self, *args, **kwargs):
 		lastEnding = YearEnding.objects.all().last()

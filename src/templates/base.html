@@ -15,10 +15,10 @@
 {% endcompress %}
 <style>
 body, table{
-   background-image: url("{% static 'images/background.jpg' %}") !important;
+   background-image: re_path("{% static 'images/background.jpg' %}") !important;
 }
 .navbar{
-   background-image: url("{% static 'images/background.jpg' %}") !important;
+   background-image: re_path("{% static 'images/background.jpg' %}") !important;
 }
 {% if is_retrieve %}
 .footable-edit, .footable-delete{
@@ -35,7 +35,7 @@ body, table{
     {% block content %}
     {% endblock content %}
  {% include "home/search_item_modal.html" %}
- 
+
 {% compress js %}
 <script src="{% static '/js/jquery.min.js' %}"></script>
 <script type="text/javascript" src="{% static 'js/jquery-ui.min.js' %}"></script>

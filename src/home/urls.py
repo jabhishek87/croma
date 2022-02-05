@@ -1,9 +1,9 @@
-from django.conf.urls import url  
+from django.conf.urls import url
 from .views import HomePage, takeBackup
 
 
 urlpatterns = [
-    url(r'^$', HomePage, name = "home"),
-    url(r'ajax/backup', takeBackup, name = "takeBackup"),
-    
+    re_path(r'^$', HomePage, name = "home"),
+    re_path(r'ajax/backup', takeBackup, name = "takeBackup"),
+
 ]

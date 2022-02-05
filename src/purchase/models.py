@@ -2,7 +2,7 @@ from django.db import models
 from django.db.models.signals import pre_save, post_save
 from django.conf import settings
 from django.utils import timezone
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from accounts.models import Accounts, Head, YearEnding
 from item_master.models import Item, Batch
 from company_master.models import Supplier
@@ -30,10 +30,9 @@ gst_choice = (
 )
 
 class PurchaseInvHrd(models.Model):
-    
 	doc_no = 		models.IntegerField(blank = True, null = True, db_index=True)
 	doc_dt = 		models.DateField(default = timezone.now)
-	supplier_id = 	models.ForeignKey(Supplier, default = 1)
+	supplier_id = 	models.ForeignKey(Supplier, on_delete = models.CASCADE, default = 1)
 	p_method = 		models.CharField(max_length = 50, choices = mode_choices, default = "CASH") #link to
 	supp_chal_no = 	models.CharField(max_length = 50, null = True, blank = True, db_index=True) #link to
 	supp_chal_dt =	models.DateField(default = timezone.now)
@@ -53,32 +52,32 @@ class PurchaseInvHrd(models.Model):
 	paid_adj_type = models.CharField(max_length = 10, choices = oa_type_choice, default = 'Positive')
 	paid_amount = 	models.DecimalField(max_digits=10, decimal_places=2, default = 0.00, blank = True)
 
-	user_id = 		models.ForeignKey(settings.AUTH_USER_MODEL, default=1)
+	user_id = 		models.ForeignKey(settings.AUTH_USER_MODEL, on_delete = models.CASCADE,default=1)
 	use_date =		models.DateField(null = True, blank = True)
 	use_time = 		models.TimeField(null = True, blank = True)
 	due_amt = 		models.DecimalField(max_digits=8, decimal_places=2, default = 0.00, blank = True)
 	ref_note = 		models.CharField(max_length = 80, blank = True, null = True) #link to
-	session_id = models.ForeignKey(YearEnding, default=1, db_index=True)
+	session_id = models.ForeignKey(YearEnding, on_delete = models.CASCADE, default=1, db_index=True)
 
 	def __str__(self):
 		return str(self.doc_no)
 
-	def get_absolute_edit_url(self):
+	def get_absolute_edit_re_path(self):
 		return reverse("purchase:edit", kwargs={"pk" : self.pk})
 
-	def get_absolute_url(self):
+	def get_absolute_re_path(self):
 		return reverse("purchase:detail", kwargs={"pk" : self.pk})
 	# method for updating
 	class Meta:
 		unique_together = (
-			("session_id", "doc_no"), 
+			("session_id", "doc_no"),
 			("supplier_id", "supp_chal_no", "session_id")
 		)
 
 
 class PurchaseInvDtl(models.Model):
 	hrd_id = 		models.ForeignKey(PurchaseInvHrd, on_delete=models.CASCADE, null = True, blank = True, db_index = True)
-	item_id = 		models.ForeignKey(Item, db_index = True)
+	item_id = 		models.ForeignKey(Item, on_delete = models.CASCADE,db_index = True)
 	batch_no = 		models.CharField(max_length = 15, db_index = True)
 	strip_qty = 	models.IntegerField(blank =True, default = 0)
 	nos_qty = 		models.IntegerField(blank =True, default = 0)

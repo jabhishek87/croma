@@ -1,10 +1,11 @@
-from django.conf.urls import url, include
+from django.urls import include, re_path
+
 from .views import *
 
 urlpatterns = [
-    url(r'^register', register_view, name = "register_view"),
-    url(r'^login', loginView.as_view(), name = "login"),
-    url(r'^logout', logout_view, name = "logout"),
-    url(r'^company/register', companyRegistrationView, name="company-register"),
-    url(r'^session/expire', sessionExpireView.as_view(), name="sessionExpireView"),
+    re_path(r'^register', register_view, name = "register_view"),
+    re_path(r'^login', loginView.as_view(), name = "login"),
+    re_path(r'^logout', logout_view, name = "logout"),
+    re_path(r'^company/register', companyRegistrationView, name="company-register"),
+    re_path(r'^session/expire', sessionExpireView.as_view(), name="sessionExpireView"),
 ]

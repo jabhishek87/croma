@@ -64,7 +64,7 @@ class CreateItem(View, LoginRequiredMixin):
 				for i, batch in enumerate(batches):
 					if batch['deleted'] == 1:
 						del batches[i]
-					
+
 				sid = transaction.savepoint()
 				item_serializer_instance = ItemSerialzer(data=item_info)
 				if item_serializer_instance.is_valid():
@@ -75,7 +75,7 @@ class CreateItem(View, LoginRequiredMixin):
 					}
 					logger.error(errors['item_errors'])
 					return JsonResponse(errors, status = 400)
-				batch_serialzer_instance = BatchSerialzer(data = batches, 
+				batch_serialzer_instance = BatchSerialzer(data = batches,
 															many = True, item_id = item_instance.id)
 				if batch_serialzer_instance.is_valid():
 					batch_intances = batch_serialzer_instance.save()
@@ -89,7 +89,7 @@ class CreateItem(View, LoginRequiredMixin):
 					}
 					logger.error(errors)
 					return JsonResponse(errors, status = 400)
-				response = {'url' : item_instance.get_absolute_url()}
+				response = {'url' : item_instance.get_absolute_re_path()}
 				return JsonResponse(response, status = 200)
 		except Exception as e:
 			logger.error(str(e))
@@ -98,13 +98,13 @@ class CreateItem(View, LoginRequiredMixin):
 
 def RetrieveItem(request, pk = None):
 	datem = datetime(datetime.now().year, datetime.now().month, 1)
-    	
+
 	if not request.user.is_authenticated():
 		return redirect('/account/login')
-	
+
 	current_session = get_object_or_404(YearEnding, id=request.session['session'])
 	instance = get_object_or_404(Item, id = pk)
-	
+
 	batch_queryset = Batch.objects.filter(item_id=pk, expiry__gt = datem).order_by("-expiry")
 	batch_data = serialize('json', batch_queryset)
 	json_batch_data = json.loads(batch_data)
@@ -137,7 +137,7 @@ def RetrieveItem(request, pk = None):
 class UpdateItem(UpdateView, LoginRequiredMixin):
 	template_name = 'item_master/index.html'
 	login_url = '/account/login'
-	
+
 	def get(self, request, pk = None):
 		if not request.user.is_authenticated():
 			return HttpResponseRedirect(self.login_url)
@@ -166,7 +166,7 @@ class UpdateItem(UpdateView, LoginRequiredMixin):
 			"current_session": current_session
 		}
 		return render(self.request, self.template_name, context)
-				
+
 	@transaction.atomic
 	def post(self, request, pk = None):
 		sid = transaction.savepoint()
@@ -198,7 +198,7 @@ class UpdateItem(UpdateView, LoginRequiredMixin):
 							batch_qs = Batch.objects.get(item_id = item_obj, batch_no = batch_obj['batch_no'])
 							serializer_batch = BatchSerialzer(batch_qs, data=batch_obj, item_id =item_obj.id, many = False)
 							strip_old, nos_old = batch_qs.strip, batch_qs.nos
-							
+
 							item_obj.handle_ItemQty_Stock_OnAdd(strip_new-strip_old, nos_new-nos_old)
 							batch_qs.handle_BatchQty_Stock_OnAdd(strip_new-strip_old, nos_new-nos_old)
 
@@ -218,7 +218,7 @@ class UpdateItem(UpdateView, LoginRequiredMixin):
 				if serializer_item.is_valid():
 					item = serializer_item.save()
 					transaction.savepoint_commit(sid)
-					response = {'url' : item.get_absolute_url(),}
+					response = {'url' : item.get_absolute_re_path(),}
 					return JsonResponse(response, status = 200)
 				else:
 					errors = {'item_errors': serializer_item.errors,}
@@ -251,7 +251,7 @@ def DeleteItem(request):
 			response = {'status': 0, "errors": errors}
 			logger.error(errors)
 			return JsonResponse(response, status=400)
-			
+
 		if PurchaseInvDtl.objects.filter(item_id = item_obj).exists() or \
 				SalesInvDtl.objects.filter(item_id = item_obj).exists():
 			errors['stock_item'] = "Error: This Item Cannot be Deleted. You have Stock of this Item"
@@ -264,7 +264,7 @@ def DeleteItem(request):
 			obj.delete()
 		try:
 			next_item = Item.objects.get(id = item_obj.id + 1)
-			url = next_pur_inv.get_absolute_url()
+			url = next_pur_inv.get_absolute_re_path()
 		except:
 			next_item = None
 			url = "/item/create"
@@ -286,7 +286,7 @@ def search_item(request):
 		for item in item_list:
 			item_obj = {}
 			item_obj['name'] = str(item.name)
-			item_obj['url'] = str(item.get_absolute_url())
+			item_obj['url'] = str(item.get_absolute_re_path())
 			item_json_Arr.append(item_obj)
 
 		data = {
@@ -303,10 +303,10 @@ def date_handler(obj):
 def get_item_batches(request):
 	if request.method == "GET" and request.is_ajax():
 		datem = datetime(datetime.now().year, datetime.now().month, 1)
-    		
+
 		print(datem)
 		item_id = request.GET['item_id']
-		batch_list = Batch.objects.filter(item_id = int(item_id), 
+		batch_list = Batch.objects.filter(item_id = int(item_id),
 										expiry__gt = datem).order_by('expiry')
 
 		item = Item.objects.get(id = item_id)
@@ -349,8 +349,8 @@ def search_item_info(request):
 		datem = datetime(datetime.now().year, datetime.now().month, 1)
 		try:
 			item_q = get_object_or_404(Item, name = item)
-			
-			batches = Batch.objects.filter(item_id = item_q, 
+
+			batches = Batch.objects.filter(item_id = item_q,
 						expiry__gt = datem)
 			response = {
 				"status" : "1",

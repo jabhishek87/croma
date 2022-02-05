@@ -1,9 +1,9 @@
-from django.conf.urls import url, include
+from django.urls import include, re_path
 from .views import *
 
 
 urlpatterns = [
-	url(r'^chain-list/$', ChainListApiView.as_view(), name = "chain-list"),
-	url(r'^company-list/$',	CompanyListApiView.as_view(), name = "company-list"),
-	url(r'^supplier-list/$', SupplierListApiView.as_view(), name = "supplier-list"),
+	re_path(r'^chain-list/$', ChainListApiView.as_view(), name = "chain-list"),
+	re_path(r'^company-list/$',	CompanyListApiView.as_view(), name = "company-list"),
+	re_path(r'^supplier-list/$', SupplierListApiView.as_view(), name = "supplier-list"),
 ]

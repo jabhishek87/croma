@@ -25,7 +25,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    'rest_framework',
+    # 'rest_framework',
     'accounts',
     'item_master',
     'unit_master',
@@ -114,9 +114,9 @@ TEMPLATES = [
 WSGI_APPLICATION = 'croma.wsgi.application'
 
 
-backup_dir = "E:\\backup"
-if not os.path.exists(backup_dir):
-    os.makedirs(backup_dir)
+# backup_dir = "E:\\backup"
+# if not os.path.exists(backup_dir):
+#     os.makedirs(backup_dir)
 
 DATABASES = {
     'default': {
@@ -124,7 +124,6 @@ DATABASES = {
         'NAME': os.path.join(BASE_DIR, 'db/db.sqlite3'),
     }
 }
-
 
 AUTH_PASSWORD_VALIDATORS = [
     {

@@ -71,7 +71,7 @@ class CreatePurchase(View, LoginRequiredMixin):
 					except Exception as e:
 						logger.error(str(e))
 						next_doc_no = 1
-					
+
 					pur_info['session_id'], pur_info['doc_no'] = current_session_id, next_doc_no
 					#saving Purchasehrd Form
 					serializer_pur_hrd =  PurchaseInvHdrSerialzer(data=pur_info)
@@ -126,7 +126,7 @@ class CreatePurchase(View, LoginRequiredMixin):
 							return JsonResponse(response, status=400)
 					response = {
 						'status': 1,
-						'url' : pur_hrd_obj.get_absolute_url(),
+						'url' : pur_hrd_obj.get_absolute_re_path(),
 					}
 					return JsonResponse(response, status = 200)
 		except Exception as e:
@@ -284,7 +284,7 @@ class UpdatePurchase(UpdateView, LoginRequiredMixin):
 							total_strip_new, total_nos_new = int(item['strip_qty']) + int(item['strip_free']), int(item['nos_qty']) + int(item['nos_free'])
 							item_obj.handle_c_s_gst(item['cgst'], item['sgst'])
 							# UPDATE THE Existing BATCH
-							
+
 							if PurchaseInvDtl.objects.filter(hrd_id = pk, item_id = item['item_id'], batch_no = item['batch_no']).exists():
 								#getting the entery from DB  of hrd_id= pk, batch_no = item's batch_no and item_id = item_obj
 								item_qs = PurchaseInvDtl.objects.get(hrd_id = pk, item_id = item['item_id'], batch_no = item['batch_no'])
@@ -316,7 +316,7 @@ class UpdatePurchase(UpdateView, LoginRequiredMixin):
 					response = {
 							'status': 1,
 							'message': "Successfully Saved",
-							'url' : PurchaseInvHrd_instance.get_absolute_url(),
+							'url' : PurchaseInvHrd_instance.get_absolute_re_path(),
 					}
 					# transaction.savepoint_commit(sid)
 					return JsonResponse(response, status=200)
@@ -359,7 +359,7 @@ def DeletePurchase(request):
 
 		try:
 			next_pur_inv = PurchaseInvHrd.objects.filter(id__gt = pur_inv_obj.id, session_id = current_session).order_by("pk")[0]
-			url = next_pur_inv.get_absolute_url()
+			url = next_pur_inv.get_absolute_re_path()
 		except Exception as e:
 			next_sale_inv = None
 			url = "/purchase/create"
@@ -379,7 +379,7 @@ def SearchInv(request):
 		inv_no = request.GET.get("pur_inv")
 		if PurchaseInvHrd.objects.filter(session_id = current_session, doc_no = inv_no).exists():
 			purchase_inv_obj = PurchaseInvHrd.objects.get(session_id = current_session, doc_no = inv_no)
-			response = {"status": 1, "msg" : purchase_inv_obj.get_absolute_url()}
+			response = {"status": 1, "msg" : purchase_inv_obj.get_absolute_re_path()}
 		else:
 			response = {"status": 0, "msg": "No Invoice Found"}
 
@@ -395,7 +395,7 @@ def checkSupplierNameInv(request):
 			inv_no = json_dict['challanNo']
 			name = json_dict['supplierName']
 			supp_id = Supplier.objects.get(name = name).id
-			if PurchaseInvHrd.objects.filter(session_id=current_session, 
+			if PurchaseInvHrd.objects.filter(session_id=current_session,
 									supp_chal_no=inv_no, supplier_id=supp_id).exists():
 				response = {"status": 0}
 				return JsonResponse(response, status=400)
@@ -405,4 +405,4 @@ def checkSupplierNameInv(request):
 
 	except Exception as e:
 		response = {"status": str(e)}
-		return JsonResponse(response, status=400)	
+		return JsonResponse(response, status=400)

@@ -1,0 +1,4 @@
+python manage.py shell < custom_scripts/loader.py
+
+python manage.py dumpdata --format=yaml > data.yaml
+python manage.py shell < custom_scripts/importer.py

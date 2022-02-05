@@ -27,17 +27,17 @@ class Head(models.Model):
 class Accounts(models.Model):
 	name =				models.CharField(max_length = 150, unique = True)
 	alias_name =		models.CharField(max_length = 30, null = True, blank = True)
-	head_id = 			models.ForeignKey(Head)
+	head_id = 			models.ForeignKey(Head, on_delete = models.CASCADE)
 	OpeningBalance = 	models.DecimalField(max_digits=12, decimal_places=4, default = 0, null = True, blank = True)
 	ItNo = 				models.CharField(max_length = 30, null = True, blank = True)
 	StNo = 				models.CharField(max_length = 30, null = True, blank = True)
 	Type = 				models.CharField(max_length = 5, null = True, blank = True)
 	category =			models.CharField(max_length = 30, null = True, blank = True )
 	Current_Balance = 	models.DecimalField(max_digits=12, decimal_places=4, default = 0, null = True, blank = True)
-	user_id =  			models.ForeignKey(settings.AUTH_USER_MODEL, default=1)
+	user_id =  			models.ForeignKey(settings.AUTH_USER_MODEL, on_delete = models.CASCADE, default=1)
 	use_date = 			models.DateField(null = True, blank = True)
 	use_time = 			models.TimeField(null = True, blank = True)
-	
+
 	class Meta:
 	    verbose_name = 'Account'
 	    verbose_name_plural = 'Accounts'
@@ -70,7 +70,7 @@ class Registration(models.Model):
 	cst = 			models.CharField(max_length = 50, blank = True, null = True)
 	gst_no =		models.CharField(max_length = 50, blank = True, null = True)
 	tin_no = 		models.CharField(max_length = 50, blank = True, null = True)
-	user_id =  		models.ForeignKey(settings.AUTH_USER_MODEL, default=1)
+	user_id =  		models.ForeignKey(settings.AUTH_USER_MODEL, on_delete = models.CASCADE, default=1)
 
 	def __str__(self):
 		return self.company_name
@@ -82,11 +82,11 @@ class YearEnding(models.Model):
 	year_sale_id = 	models.IntegerField(blank = True, null = True)
 	from_dt = 		models.DateField()
 	to_dt = 		models.DateField()
-	registration_id = models.ForeignKey(Registration, default = 1)
-	
+	registration_id = models.ForeignKey(Registration, on_delete = models.CASCADE, default = 1)
+
 	def __str__(self):
 		return self.code + ",   Year = [ " + str(self.from_dt.year) + " to " + str(self.to_dt.year) + " ]"
 
-	def get_absolute_report1_url(self):
+	def get_absolute_report1_re_path(self):
 		return reverse("reports:report1_url", kwargs={"from_dt" : self.from_dt, "to_dt": self.to_dt})
 

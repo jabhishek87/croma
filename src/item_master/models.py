@@ -4,7 +4,7 @@ from django.conf import settings
 from django.utils import timezone
 from django.template.defaultfilters import slugify
 from .utils import random_string
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from unit_master.models import Unit
 from company_master.models import Company, Chain, Supplier
 from salt_master.models import Salt
@@ -35,7 +35,7 @@ class TaxType(models.Model):
 	ac = 			models.CharField(max_length = 50, null = True, blank = True)
 	tax_ac = 		models.CharField(max_length = 50, null = True, blank = True)
 	calc_on = 		models.CharField(max_length = 50, default = "AFTER DISCOUNT")
-	user_id = 		models.ForeignKey(settings.AUTH_USER_MODEL, default=1)
+	user_id = 		models.ForeignKey(settings.AUTH_USER_MODEL, on_delete = models.CASCADE,default=1)
 	use_date =		models.DateField(null = True, blank = True)
 	use_time = 		models.TimeField(null = True, blank = True)
 
@@ -61,12 +61,12 @@ def create_item_code():
 class Item(models.Model):
 	item_code = 	models.CharField(max_length = 20, null = True, blank =True)
 	name = 			models.CharField(max_length=80, unique=True, db_index=True)
-	group_id = 		models.ForeignKey(Chain, default = 37)
-	unit_id = 		models.ForeignKey(Unit, default = 601)
-	salt_id = 		models.ForeignKey(Salt, default=715)
-	godown_id = 	models.ForeignKey(Godown, default=1)
-	stax_id = 		models.ForeignKey(TaxType, default=1, related_name = 'ServiceTax', limit_choices_to={'applicable': 'Sale'})
-	ptax_id = 		models.ForeignKey(TaxType, default=2, related_name = 'PurchaseTax', limit_choices_to={'applicable': 'Purchase'})
+	group_id = 		models.ForeignKey(Chain, on_delete = models.CASCADE,default = 1)
+	unit_id = 		models.ForeignKey(Unit, on_delete = models.CASCADE,default = 1)
+	salt_id = 		models.ForeignKey(Salt, on_delete = models.CASCADE,default=2)
+	godown_id = 	models.ForeignKey(Godown, on_delete = models.CASCADE,default=1)
+	stax_id = 		models.ForeignKey(TaxType, on_delete = models.CASCADE,default=1, related_name = 'ServiceTax', limit_choices_to={'applicable': 'Sale'})
+	ptax_id = 		models.ForeignKey(TaxType, on_delete = models.CASCADE,default=2, related_name = 'PurchaseTax', limit_choices_to={'applicable': 'Purchase'})
 
 	min_qty = 		models.DecimalField(max_digits=8, decimal_places=2, default = 10, null = True, blank = True)
 	max_qty = 		models.DecimalField(max_digits=8, decimal_places=2, default = 20, null = True, blank = True)
@@ -82,10 +82,10 @@ class Item(models.Model):
 	strip_stock = 	models.IntegerField(default = 0, null = True, blank = True)
 	nos_stock = 	models.IntegerField(default = 0, null = True, blank = True)
 
-	user_id = 		models.ForeignKey(settings.AUTH_USER_MODEL, default=1)
+	user_id = 		models.ForeignKey(settings.AUTH_USER_MODEL, on_delete = models.CASCADE,default=1)
 
 	bin_no = 		models.CharField(max_length = 10, null = True, blank = True)
-	company_id = 	models.ForeignKey(Company, default = 1)
+	company_id = 	models.ForeignKey(Company, on_delete = models.CASCADE,default = 1)
 
 	sgst = 			models.CharField(default = '6', choices = gst_choice, max_length = 3)
 	cgst = 			models.CharField(default = '6', choices = gst_choice, max_length = 3)
@@ -137,10 +137,10 @@ class Item(models.Model):
 			self.sgst = sgst
 			self.save()
 
-	def get_absolute_edit_url(self):
+	def get_absolute_edit_re_path(self):
 		return reverse("item:edit", kwargs={"pk" : self.pk})
 
-	def get_absolute_url(self):
+	def get_absolute_re_path(self):
 		return reverse("item:detail", kwargs={"pk" : self.pk})
 	# method for updating
 
@@ -163,7 +163,7 @@ def postUpdateItem(sender, instance, **kwargs):
 		instance.save()
 	except:
 		pass
-		
+
 	post_save.connect(postUpdateItem, sender=sender)
 
 post_save.connect(postUpdateItem, sender = Item)
@@ -171,7 +171,7 @@ post_save.connect(postUpdateItem, sender = Item)
 
 
 class Batch(models.Model):
-	item_id = 		models.ForeignKey(Item, null=True, blank=True, db_index=True)
+	item_id = 		models.ForeignKey(Item, on_delete = models.CASCADE,null=True, blank=True, db_index=True)
 	batch_no = 		models.CharField(max_length = 15, db_index = True)
 	strip = 		models.IntegerField(null = True, blank = True, default = 0)
 	nos = 			models.IntegerField(null = True, blank = True, default = 0)

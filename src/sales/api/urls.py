@@ -1,8 +1,8 @@
-from django.conf.urls import url, include
+from django.urls import include, re_path
 from .views import *
 
 
 urlpatterns = [
-	url(r'^party-list/$',	PartyListApiView.as_view(), name = "party-list"),
-	url(r'^doctor-list/$',	DoctorListApiView.as_view(), name = "doctor-list"),
+	re_path(r'^party-list/$',	PartyListApiView.as_view(), name = "party-list"),
+	re_path(r'^doctor-list/$',	DoctorListApiView.as_view(), name = "doctor-list"),
 ]

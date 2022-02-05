@@ -6,7 +6,7 @@ from django.utils import timezone
 class Godown(models.Model):
 	name = 		models.CharField(max_length = 50, unique = True)
 	use_date = 	models.DateField(null = True, blank = True)
-	user_id = 	models.ForeignKey(settings.AUTH_USER_MODEL, default=1)
+	user_id = 	models.ForeignKey(settings.AUTH_USER_MODEL,on_delete = models.CASCADE, default=1)
 	use_time = 	models.TimeField(null = True, blank = True)
 	class Meta:
 	    verbose_name = 'Godown'

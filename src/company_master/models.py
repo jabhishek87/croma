@@ -2,7 +2,7 @@ from django.db import models
 from django.db.models.signals import pre_save, post_save
 from django.conf import settings
 from django.utils import timezone
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from godown_master.models import Godown
 from django.shortcuts import get_object_or_404
 from accounts.models import Accounts, Head
@@ -30,10 +30,10 @@ class Supplier(models.Model):
 	c_days = 		models.IntegerField(default = 0, null = True, blank = True) #CREDIT DAY
 	c_limit = 		models.DecimalField(max_digits=10, decimal_places=2, default = 0, null = True, blank = True) #Credit Amount
 
-	user_id =  		models.ForeignKey(settings.AUTH_USER_MODEL, default=1)
+	user_id =  		models.ForeignKey(settings.AUTH_USER_MODEL, on_delete = models.CASCADE,default=1)
 	use_date = 		models.DateField(null = True, blank = True)
-	account_id = 	models.ForeignKey(Accounts, default = 1)
-	head_id =		models.ForeignKey(Head, default = 22)
+	account_id = 	models.ForeignKey(Accounts, on_delete = models.CASCADE,default = 1)
+	head_id =		models.ForeignKey(Head, on_delete = models.CASCADE,default = 22)
 	less_by = 		models.IntegerField(default = 0, null = True, blank = True)
 	use_time = 		models.TimeField(null = True, blank = True)
 	identity = 		models.CharField(max_length = 30, null = True, blank = True) #NULL FIELD
@@ -60,7 +60,7 @@ class Chain(models.Model):
 	nodes = 	models.IntegerField(default = 0, blank = True, null = True)
 	category = 	models.CharField(max_length = 50, default = 'COMPANY', blank = True, null = True)
 	total = 	models.IntegerField(default = 0, blank = True, null = True)
-	user_id = 	models.ForeignKey(settings.AUTH_USER_MODEL, default=1)
+	user_id = 	models.ForeignKey(settings.AUTH_USER_MODEL, on_delete = models.CASCADE,default=1)
 	use_date = 	models.DateField(null = True, blank = True)
 	use_time = 	models.TimeField(null = True, blank = True)
 
@@ -92,11 +92,11 @@ class Company(models.Model):
 	city = 			models.CharField(max_length = 60, null = True, blank = True)
 	phone1 = 		models.CharField(max_length = 12, null = True, blank = True)
 	phone2 = 		models.CharField(max_length = 12, null = True, blank = True)
-	chain_id = 		models.ForeignKey(Chain, default=1)
-	godown_id = 	models.ForeignKey(Godown, default = 1)
+	chain_id = 		models.ForeignKey(Chain, on_delete = models.CASCADE,default=1)
+	godown_id = 	models.ForeignKey(Godown, on_delete = models.CASCADE,default = 1)
 	ptax = 			models.IntegerField(default = 5, null = True, blank = True)    #XXXX Why 5?
 
-	user_id = 		models.ForeignKey(settings.AUTH_USER_MODEL, default=1, null = True, blank = True)
+	user_id = 		models.ForeignKey(settings.AUTH_USER_MODEL, on_delete = models.CASCADE,default=1, null = True, blank = True)
 	use_date =		models.DateField(null = True, blank = True)
 
 	use_time = 		models.TimeField(null = True, blank = True)
