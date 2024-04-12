@@ -3,6 +3,7 @@ from datetime import datetime
 from zipfile import ZipFile, ZIP_DEFLATED
 import os
 from django.conf import settings
+from security import safe_command
 
 
 class BackupDatabase():
@@ -67,8 +68,7 @@ class BackupDatabase():
         return backupfpath
    
     def takeBackup(self, backupfname):
-        popen = Popen(
-            self.getCommand(backupfname), 
+        popen = safe_command.run(Popen, self.getCommand(backupfname), 
             stdout=PIPE, 
             universal_newlines=True
         )
