@@ -25,8 +25,8 @@ class BackupDatabase():
             BACKUP_FILEPATH = BACKUP_FILEPATH + f"[{currHour}].gz"
             BACKUP_FILE = BACKUP_FILE + f"[{currHour}].gz"
         else:
-            BACKUP_FILEPATH = BACKUP_FILEPATH + f".gz"
-            BACKUP_FILE = BACKUP_FILE + f".gz"
+            BACKUP_FILEPATH = BACKUP_FILEPATH + ".gz"
+            BACKUP_FILE = BACKUP_FILE + ".gz"
         return BACKUP_FILEPATH, BACKUP_FILE
 
     def getBackupZipFileName(self):
